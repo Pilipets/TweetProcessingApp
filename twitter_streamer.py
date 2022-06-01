@@ -17,9 +17,9 @@ def GetTokensV1(fpath):
 def GetTokenV2(fpath):
     return open(fpath).read()
 
-class TweetListener(tweepy.StreamingClient):
-    def __init__(self):
-        super().__init__()
+class TweetStreamer(tweepy.StreamingClient):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.producer = kafka.KafkaProducer(bootstrap_servers='localhost:9092')
 
     def on_errors(self, errors):
@@ -28,7 +28,7 @@ class TweetListener(tweepy.StreamingClient):
 
     def on_tweet(self, tweet):
         print("On tweet:", tweet.data)
-        self.producer.send('tweet-stream', tweet.data)
+        self.producer.send('tweet-stream', tweet.text.encode('utf-8'))
         return super().on_tweet(tweet)
 
 def test1():
@@ -40,7 +40,7 @@ def test1():
 
 def test2():
     token = GetTokenV2('credentials_v2.txt')
-    stream = TweetListener(token)
+    stream = TweetStreamer(token)
 
     stream.sample()
 
