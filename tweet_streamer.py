@@ -27,7 +27,8 @@ class TweetStreamer(tweepy.StreamingClient):
         return super().on_errors(errors)
 
     def on_tweet(self, tweet):
-        print("On tweet:", tweet.data)
+        print("On tweet:", tweet.json)
+        # TODO: Handle language here + send location
         self.producer.send('tweet-stream', tweet.text.encode('utf-8'))
         return super().on_tweet(tweet)
 
