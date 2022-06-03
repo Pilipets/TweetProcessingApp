@@ -27,20 +27,20 @@ class TweetStreamer(tweepy.StreamingClient):
         return super().on_errors(errors)
 
     def on_tweet(self, tweet):
-        print("On tweet:", tweet.json)
+        print("On tweet:", tweet.data)
         # TODO: Handle language here + send location
         self.producer.send('tweet-stream', tweet.text.encode('utf-8'))
         return super().on_tweet(tweet)
 
 def test1():
-    token = GetTokenV2('credentials_v2.txt')
+    token = GetTokenV2('data/credentials_v2.txt')
     client = tweepy.Client(token)
 
     resp = client.get_user(username='gleb_pilipets')
     print(resp)
 
 def test2():
-    token = GetTokenV2('credentials_v2.txt')
+    token = GetTokenV2('data/credentials_v2.txt')
     stream = TweetStreamer(token)
 
     stream.sample()
