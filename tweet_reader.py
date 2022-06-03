@@ -21,7 +21,8 @@ def process_batch(df, epoch_id):
 	print('Sent response', response)
 
 def removePunctuation(column):
-	return lower(trim(regexp_replace(column,'\\p{Punct}',''))).alias('sentence')
+	punct_string = ''.join(r'\{}'.format(ch) for ch in r"""()[]{}""'':;,.!?\-/+*<=>&|""")
+	return lower(trim(regexp_replace(column, '[{}]'.format(punct_string), '')))
 
 if __name__ == '__main__':
 
@@ -39,9 +40,9 @@ if __name__ == '__main__':
 
 	df = df.selectExpr("CAST(value AS STRING)")
 
-	# TODO: Remove the punctuation before splitting
+	# TODO: Add ML to filter tweets by semantic, and maybe replace to RDD
 	words = df \
-		.select(explode(split(df.value, " ")).alias("word")) \
+		.select(explode(split(removePunctuation(df.value), " +")).alias("word")) \
 		.filter("word like '#%'")
 
 	words = words.groupBy("word").count()

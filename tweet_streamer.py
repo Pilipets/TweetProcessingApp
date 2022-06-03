@@ -27,9 +27,10 @@ class TweetStreamer(tweepy.StreamingClient):
         return super().on_errors(errors)
 
     def on_tweet(self, tweet):
-        print("On tweet:", tweet.data)
-        # TODO: Handle language here + send location
-        self.producer.send('tweet-stream', tweet.text.encode('utf-8'))
+        print('Received tweet with lang=', tweet.lang)
+        if tweet.lang in ('en', 'uk', 'ru'):
+            print("On tweet:", tweet.data)
+            self.producer.send('tweet-stream', tweet.text.encode('utf-8'))
         return super().on_tweet(tweet)
 
 def test1():
@@ -43,7 +44,7 @@ def test2():
     token = GetTokenV2('data/credentials_v2.txt')
     stream = TweetStreamer(token)
 
-    stream.sample()
+    stream.sample(tweet_fields=['lang'])
 
 if __name__ == '__main__':
     test2()
