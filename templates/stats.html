@@ -1,89 +1,90 @@
-
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>Twitter Statistics</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    </head>
 
-    <body>
-        <center>
-            <h2>Twitter Statistics</h2>
-            <div>
-                <table style="width:100%" id="counters_table">
-                    <tr>
-                      <td>Total</td>
-                      <td>Positive</td>
-                      <td>Neutral</td>
-                      <td>Negative</td>
-                    </tr>
-                    <tr>
-                      <td>Undefined</td>
-                      <td>Undefined</td>
-                      <td>Undefined</td>
-                      <td>Undefined</td>
-                    </tr>
-                  </table>
-            </div>
-            <div style="width:50%;height:50%">
-                <canvas id="hashtags_chart"/>
-            </div>
-        </center>
+<head>
+    <meta charset="utf-8" />
+    <title>Twitter Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
 
-        <script>
-            var hashtags_chart = new Chart("hashtags_chart", {
-                type: 'bar',
-                data: {
-                    labels: [{% for item in hashtags_count.words %} "{{item}}", {% endfor %}],
-                    datasets: [{
-                        label: '# number of mentions',
-                        data: [{% for item in hashtags_count.count %} {{item}}, {% endfor %}],
-                        borderWidth: 1
+<body>
+    <center>
+        <h2>Twitter Statistics</h2>
+        <div>
+            <table style="width:100%" id="counters_table">
+                <tr>
+                    <td>Total</td>
+                    <td>Positive</td>
+                    <td>Neutral</td>
+                    <td>Negative</td>
+                </tr>
+                <tr>
+                    <td>Undefined</td>
+                    <td>Undefined</td>
+                    <td>Undefined</td>
+                    <td>Undefined</td>
+                </tr>
+            </table>
+        </div>
+        <div style="width:50%;height:50%">
+            <canvas id="hashtags_chart" />
+        </div>
+    </center>
+
+    <script>
+        var hashtags_chart = new Chart("hashtags_chart", {
+            type: 'bar',
+            data: {
+                labels: [{% for item in hashtags_count.words %} "{{item}}", {% endfor %}],
+        datasets: [{
+            label: '# number of mentions',
+            data: [{% for item in hashtags_count.count %} {{ item }}, {% endfor %}],
+            borderWidth: 1
                     }]
                 },
-                options: {
-                    indexAxis: 'y'
-                }
+        options: {
+            indexAxis: 'y'
+        }
             });
 
-            var counters_table = document.getElementById('counters_table').rows[1].cells;
-            counters_table[0].innerHTML = "{{sentiment_counters.total}}";
-            counters_table[1].innerHTML = "{{sentiment_counters.positive}}";
-            counters_table[2].innerHTML = "{{sentiment_counters.neutral}}";
-            counters_table[3].innerHTML = "{{sentiment_counters.negative}}";
+        var counters_table = document.getElementById('counters_table').rows[1].cells;
+        counters_table[0].innerHTML = "{{sentiment_counters.total}}";
+        counters_table[1].innerHTML = "{{sentiment_counters.positive}}";
+        counters_table[2].innerHTML = "{{sentiment_counters.neutral}}";
+        counters_table[3].innerHTML = "{{sentiment_counters.negative}}";
 
 
-            setInterval(function(){
+        setInterval(function () {
 
-                $.getJSON('/hashtags_count', {
-                }, function(data) {
-                    hashtags_count = data
+            $.getJSON('/hashtags_count', {
+            }, function (data) {
+                hashtags_count = data
 
-                    hashtags_chart.data.labels = hashtags_count.words;
-                    hashtags_chart.data.datasets[0].data = hashtags_count.count;
-                });
+                hashtags_chart.data.labels = hashtags_count.words;
+                hashtags_chart.data.datasets[0].data = hashtags_count.count;
+            });
 
-                hashtags_chart.update();
+            hashtags_chart.update();
 
-            }, 2000);
+        }, 2000);
 
-            setInterval(function(){
+        setInterval(function () {
 
-                $.getJSON('/sentiment_counters', {
-                }, function(data) {
-                    sentiment_counters = data
+            $.getJSON('/sentiment_counters', {
+            }, function (data) {
+                sentiment_counters = data
 
-                    counters_table[0].innerHTML = sentiment_counters.total;
-                    counters_table[1].innerHTML = sentiment_counters.positive;
-                    counters_table[2].innerHTML = sentiment_counters.neutral;
-                    counters_table[3].innerHTML = sentiment_counters.negative;
-                });
+                counters_table[0].innerHTML = sentiment_counters.total;
+                counters_table[1].innerHTML = sentiment_counters.positive;
+                counters_table[2].innerHTML = sentiment_counters.neutral;
+                counters_table[3].innerHTML = sentiment_counters.negative;
+            });
 
-            }, 2000);
+        }, 2000);
 
 
-        </script>
-    </body>
+    </script>
+</body>
+
 </html>

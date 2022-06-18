@@ -1,0 +1,5 @@
+0. Add OOP-like architecture.
+1. Add categorizing the tweets using ML.
+2. Add a running tweet line with the last k tweets.
+3. Add checkpoints to the twint/spark context.
+4. Setup twint with proxies + fetch only needed fields in .csv.
