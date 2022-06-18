@@ -1,29 +1,41 @@
 from flask import Flask, jsonify, request
 from flask import render_template
 
-def get_empty_stats():
-	return {'labels':[], 'values':[]}
-
 app = Flask('twitter-hashtags')
-stats_data = get_empty_stats()
+hashtags_count = {'words':[], 'count':[]}
+sentiment_counters = {'positive':0, 'neutral':0, 'negative':0, 'total':0}
 
 @app.route("/")
 def get_chart_page():
-	global stats_data
-	stats_data = get_empty_stats()
-	return render_template('stats.html', labels=stats_data.get('labels'), values=stats_data.get('values'))
+	global hashtags_count
+	global sentiment_counters
 
-@app.route('/refreshData')
+	return render_template('stats.html', hashtags_count=hashtags_count, sentiment_counters=sentiment_counters)
+
+@app.route('/hashtags_count', methods=['GET'])
 def refresh_chart_data():
-	print("Stats data now:", stats_data)
-	return jsonify(stats_data)
+	print("Hashtags count now:", hashtags_count)
+	return jsonify(hashtags_count)
 
-@app.route('/updateData', methods=['POST'])
-def update_chart_data():
-	global stats_data
-	stats_data = request.get_json()
+@app.route('/sentiment_counters', methods=['GET'])
+def refresh_hashtags_count():
+	print("Sentiment_counters now:", sentiment_counters)
+	return jsonify(sentiment_counters)
 
-	print("Received data:", stats_data)
+@app.route('/update_hashtags_count', methods=['POST'])
+def update_hashtags_count():
+	global hashtags_count
+	hashtags_count = request.get_json()
+
+	print("Received hashtags_count:", hashtags_count)
+	return "success", 201
+
+@app.route('/update_sentiment_counters', methods=['POST'])
+def update_sentiment_counters():
+	global sentiment_counters
+	sentiment_counters = request.get_json()
+
+	print("Received sentiment_counters:", sentiment_counters)
 	return "success", 201
 
 if __name__ == "__main__":
