@@ -10,7 +10,7 @@ os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming
 
 
 def send_top_count_words(df, epoch_id, num, api):
-    df = df.orderBy(F.col("count").desc()).head(num)
+    df = df.head(num)
 
     words, counts = [], []
     for row in df:
@@ -32,13 +32,16 @@ def remove_punctuation(column):
 
 
 def get_top_hashtags(df):
+    if df.empty: return
+
     words = df \
         .select(F.explode(F.split(remove_punctuation(df.value), " +")).alias("word")) \
         .filter("word like '#%'")
 
     words = words.groupBy("word").count()
+    top_words = words.orderBy(F.col("count").desc())
 
-    query = words\
+    query = top_words\
         .writeStream \
         .outputMode("complete") \
         .foreachBatch(lambda df, epoch_id: send_top_count_words(df, epoch_id, 10, 'http://localhost:10000/update_hashtags_count')) \
@@ -50,12 +53,12 @@ def get_top_hashtags(df):
 
 def get_sentiment(text):
     sent = TextBlob(text).sentiment.polarity
-    neutral_threshold = 0
+    neutral_limit = 0.05
 
-    if sent >= neutral_threshold:
+    if sent >= neutral_limit:
         return (1, 0, 0)  # positive
 
-    elif sent > -neutral_threshold:
+    elif sent > -neutral_limit:
         return (0, 1, 0)  # neutral
 
     else:
@@ -63,6 +66,7 @@ def get_sentiment(text):
 
 
 def send_sentiment_counter(df, epoch_id, api):
+    if df.empty: return
     pos, neutral, neg = df.first()[0]
 
     total = pos + neutral + neg

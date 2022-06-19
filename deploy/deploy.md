@@ -13,6 +13,8 @@ Install javac for Apache Spark
 python client_app.py  
 open localhost:10000 in browser  
 
-# Run the core logic
-python twint_tweet_streamer.py or python tweepy_tweet_streamer.py  
-python tweet_reader  
+# Run the core logic 
+python tweet_reader.py
+
+# Run the streaming logic
+python twint_tweet_streamer.py or python tweepy_tweet_streamer.py

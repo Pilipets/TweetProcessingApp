@@ -52,7 +52,7 @@ def get_big_data_csv(search, limit, out_path):
 
 
 def test2():
-    df = get_big_data_csv('ukraine war', 10, 'data/ukraine_war_ds.csv')
+    df = get_big_data_csv('ukraine war', 100, 'data/ukraine_war_ds.csv')
     producer = kafka.KafkaProducer(bootstrap_servers='localhost:9092')
 
     for tweet_text in df.tweet:
